@@ -2,6 +2,7 @@ package discovery
 
 import (
 	"net"
+
 	"github.com/yourusername/netprobe/internal/logger"
 )
 

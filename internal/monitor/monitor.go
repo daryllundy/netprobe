@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"context"
+
 	"github.com/yourusername/netprobe/internal/logger"
 )
 

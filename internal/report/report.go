@@ -2,6 +2,7 @@ package report
 
 import (
 	"encoding/json"
+
 	"github.com/yourusername/netprobe/internal/logger"
 )
 

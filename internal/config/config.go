@@ -26,10 +26,10 @@ type LoggingConfig struct {
 }
 
 type SecurityConfig struct {
-	Encryption   string   `mapstructure:"encryption"`
-	FIPSMode     bool     `mapstructure:"fips_mode"`
-	MinTLSVersion string  `mapstructure:"min_tls_version"`
-	CipherSuites []string `mapstructure:"cipher_suites"`
+	Encryption    string   `mapstructure:"encryption"`
+	FIPSMode      bool     `mapstructure:"fips_mode"`
+	MinTLSVersion string   `mapstructure:"min_tls_version"`
+	CipherSuites  []string `mapstructure:"cipher_suites"`
 }
 
 type ScanConfig struct {
