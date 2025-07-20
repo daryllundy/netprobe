@@ -1,7 +1,6 @@
 # NetProbe
 
-[![Go Version](https://img.shields.io/badge/go-1.21+-blue.svg)](https://golang.org)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Go Version](https://img.shields.io/badge/go-1.21+-blue.svg)](https://golang.org) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 A federal-compliant network analysis tool for restricted and air-gapped environments.
 
@@ -19,7 +18,7 @@ A federal-compliant network analysis tool for restricted and air-gapped environm
 
 ```bash
 # Clone and build
-git clone https://github.com/yourusername/netprobe.git
+git clone https://github.com/daryllundy/netprobe.git
 cd netprobe
 make build
 
