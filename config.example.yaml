@@ -1,0 +1,13 @@
+logging:
+  level: info
+  format: json
+  file: /var/log/netprobe/netprobe.log
+
+security:
+  encryption: aes-256-gcm
+  fips_mode: false
+  min_tls_version: "1.2"
+
+scan:
+  timeout: 5s
+  max_concurrent: 100
