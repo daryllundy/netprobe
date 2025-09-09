@@ -9,14 +9,15 @@ import (
 )
 
 type Config struct {
-	LogLevel   string         `mapstructure:"log_level"`
-	LogFormat  string         `mapstructure:"log_format"`
-	LogFile    string         `mapstructure:"log_file"`
-	FIPS       bool           `mapstructure:"fips_mode"`
-	ConfigFile string         `mapstructure:"-"`
-	Logging    LoggingConfig  `mapstructure:"logging"`
-	Security   SecurityConfig `mapstructure:"security"`
-	Scan       ScanConfig     `mapstructure:"scan"`
+	LogLevel   string          `mapstructure:"log_level"`
+	LogFormat  string          `mapstructure:"log_format"`
+	LogFile    string          `mapstructure:"log_file"`
+	FIPS       bool            `mapstructure:"fips_mode"`
+	ConfigFile string          `mapstructure:"-"`
+	Logging    LoggingConfig   `mapstructure:"logging"`
+	Security   SecurityConfig  `mapstructure:"security"`
+	Scan       ScanConfig      `mapstructure:"scan"`
+	Bandwidth  BandwidthConfig `mapstructure:"bandwidth"`
 }
 
 type LoggingConfig struct {
@@ -35,6 +36,13 @@ type SecurityConfig struct {
 type ScanConfig struct {
 	Timeout       string `mapstructure:"timeout"`
 	MaxConcurrent int    `mapstructure:"max_concurrent"`
+}
+
+type BandwidthConfig struct {
+	Timeout      string `mapstructure:"timeout"`
+	TestDuration string `mapstructure:"test_duration"`
+	BufferSize   int    `mapstructure:"buffer_size"`
+	Protocol     string `mapstructure:"protocol"`
 }
 
 func Load() (*Config, error) {
@@ -58,6 +66,12 @@ func Load() (*Config, error) {
 		Scan: ScanConfig{
 			Timeout:       "5s",
 			MaxConcurrent: 100,
+		},
+		Bandwidth: BandwidthConfig{
+			Timeout:      "30s",
+			TestDuration: "10s",
+			BufferSize:   65536,
+			Protocol:     "tcp",
 		},
 	}
 
