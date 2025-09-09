@@ -108,7 +108,29 @@ func Load() (*Config, error) {
 }
 
 func (c *Config) Validate() error {
-	// Add validation logic here
+	// FIPS mode validation
+	if c.FIPS {
+		// Check if encryption algorithm is FIPS-compliant
+		if c.Security.Encryption != "aes-256-gcm" && c.Security.Encryption != "aes-128-gcm" {
+			return fmt.Errorf("encryption algorithm %s is not FIPS-compliant", c.Security.Encryption)
+		}
+
+		// Check if minimum TLS version is 1.2 or higher
+		if c.Security.MinTLSVersion != "1.2" && c.Security.MinTLSVersion != "1.3" {
+			return fmt.Errorf("minimum TLS version %s is not FIPS-compliant", c.Security.MinTLSVersion)
+		}
+
+		// Check if cipher suites are FIPS-compliant
+		for _, cipher := range c.Security.CipherSuites {
+			if cipher != "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384" &&
+				cipher != "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256" &&
+				cipher != "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384" &&
+				cipher != "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256" {
+				return fmt.Errorf("cipher suite %s is not FIPS-compliant", cipher)
+			}
+		}
+	}
+
 	return nil
 }
 
