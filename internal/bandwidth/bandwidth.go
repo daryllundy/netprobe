@@ -7,7 +7,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/yourusername/netprobe/internal/logger"
+	"github.com/daryllundy/netprobe/internal/logger"
 )
 
 type Tester struct {
@@ -101,24 +101,46 @@ func (t *Tester) testDownload(ctx context.Context, host string, port int) (float
 	totalBytes := 0
 	start := time.Now()
 
+	// Set a timeout for individual read operations
+	readWriteTimeout := 5 * time.Second
+	ctx, cancel := context.WithTimeout(ctx, readWriteTimeout)
+	defer cancel()
+
 	for time.Since(start) < t.options.TestDuration {
 		select {
 		case <-ctx.Done():
+			// If the main context is cancelled, or read/write times out
+			if ctx.Err() == context.DeadlineExceeded {
+				return 0, fmt.Errorf("download read operation timed out after %v", readWriteTimeout)
+			}
 			return 0, ctx.Err()
 		default:
 		}
 
+		// Perform a non-blocking read or use a deadline for the read call itself.
+		// Using SetReadDeadline is a more direct approach for this.
+		deadline := time.Now().Add(readWriteTimeout)
+		if err := conn.SetReadDeadline(deadline); err != nil {
+			return 0, fmt.Errorf("failed to set read deadline: %w", err)
+		}
+
 		n, err := conn.Read(buffer)
 		if err != nil {
-			if err == io.EOF {
-				break
+			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+				return 0, fmt.Errorf("download read operation timed out after %v", readWriteTimeout)
 			}
-			return 0, err
+			if err == io.EOF {
+				break // End of stream
+			}
+			return 0, err // Other read errors
 		}
 		totalBytes += n
 	}
 
 	duration := time.Since(start).Seconds()
+	if duration == 0 { // Avoid division by zero if test was extremely short or no data transferred
+		duration = 1 // Treat as 1 second for Mbps calculation, or handle as 0 Mbps
+	}
 	mbps := float64(totalBytes*8) / (1000000 * duration)
 
 	return mbps, nil
@@ -142,21 +164,41 @@ func (t *Tester) testUpload(ctx context.Context, host string, port int) (float64
 	totalBytes := 0
 	start := time.Now()
 
+	// Set a timeout for individual write operations
+	readWriteTimeout := 5 * time.Second
+	ctx, cancel := context.WithTimeout(ctx, readWriteTimeout)
+	defer cancel()
+
 	for time.Since(start) < t.options.TestDuration {
 		select {
 		case <-ctx.Done():
+			if ctx.Err() == context.DeadlineExceeded {
+				return 0, fmt.Errorf("upload write operation timed out after %v", readWriteTimeout)
+			}
 			return 0, ctx.Err()
 		default:
 		}
 
+		// Perform a non-blocking write or use a deadline for the write call itself.
+		deadline := time.Now().Add(readWriteTimeout)
+		if err := conn.SetWriteDeadline(deadline); err != nil {
+			return 0, fmt.Errorf("failed to set write deadline: %w", err)
+		}
+
 		n, err := conn.Write(buffer)
 		if err != nil {
-			return 0, err
+			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+				return 0, fmt.Errorf("upload write operation timed out after %v", readWriteTimeout)
+			}
+			return 0, err // Other write errors
 		}
 		totalBytes += n
 	}
 
 	duration := time.Since(start).Seconds()
+	if duration == 0 { // Avoid division by zero
+		duration = 1
+	}
 	mbps := float64(totalBytes*8) / (1000000 * duration)
 
 	return mbps, nil
