@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/daryllundy/netprobe/internal/config"
 	"github.com/sirupsen/logrus"
-	"github.com/yourusername/netprobe/internal/config"
 )
 
 type Logger interface {

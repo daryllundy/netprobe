@@ -1,4 +1,4 @@
-module github.com/yourusername/netprobe
+module github.com/daryllundy/netprobe
 
 go 1.21
 

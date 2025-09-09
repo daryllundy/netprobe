@@ -3,7 +3,7 @@ package monitor
 import (
 	"context"
 
-	"github.com/yourusername/netprobe/internal/logger"
+	"github.com/daryllundy/netprobe/internal/logger"
 )
 
 type Monitor struct {

@@ -7,7 +7,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/yourusername/netprobe/internal/logger"
+	"github.com/daryllundy/netprobe/internal/logger"
 )
 
 type Tester struct {

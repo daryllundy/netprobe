@@ -3,7 +3,7 @@ package report
 import (
 	"encoding/json"
 
-	"github.com/yourusername/netprobe/internal/logger"
+	"github.com/daryllundy/netprobe/internal/logger"
 )
 
 type Reporter struct {

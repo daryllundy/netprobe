@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/daryllundy/netprobe/internal/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/yourusername/netprobe/internal/logger"
 )
 
 func TestScanner_Scan(t *testing.T) {

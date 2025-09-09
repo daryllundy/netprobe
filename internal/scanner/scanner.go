@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yourusername/netprobe/internal/logger"
+	"github.com/daryllundy/netprobe/internal/logger"
 )
 
 type Scanner struct {
