@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"sort"
 	"sync"
 	"time"
 
@@ -52,7 +53,6 @@ func (s *Scanner) Scan(ctx context.Context, hosts []string, ports []int) ([]Scan
 	}
 
 	results := make([]ScanResult, 0, len(hosts))
-	var mu sync.Mutex
 
 	for _, host := range hosts {
 		select {
@@ -65,6 +65,10 @@ func (s *Scanner) Scan(ctx context.Context, hosts []string, ports []int) ([]Scan
 			Host:  host,
 			Ports: make([]PortResult, 0, len(ports)),
 		}
+
+		// Use a map to collect results by port number for ordering
+		portResults := make(map[int]PortResult)
+		var mapMu sync.Mutex
 
 		// Create semaphore for concurrency control
 		sem := make(chan struct{}, s.options.Concurrent)
@@ -80,13 +84,25 @@ func (s *Scanner) Scan(ctx context.Context, hosts []string, ports []int) ([]Scan
 
 				result := s.scanPort(host, p)
 
-				mu.Lock()
-				hostResult.Ports = append(hostResult.Ports, result)
-				mu.Unlock()
+				mapMu.Lock()
+				portResults[p] = result
+				mapMu.Unlock()
 			}(port)
 		}
 
 		wg.Wait()
+
+		// Sort ports and build the results slice in numeric order
+		sortedPorts := make([]int, 0, len(ports))
+		for port := range portResults {
+			sortedPorts = append(sortedPorts, port)
+		}
+		sort.Ints(sortedPorts)
+
+		for _, port := range sortedPorts {
+			hostResult.Ports = append(hostResult.Ports, portResults[port])
+		}
+
 		results = append(results, hostResult)
 	}
 
